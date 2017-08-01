@@ -13,6 +13,7 @@ from types    import NoneType
 from DIRAC                                                      import gLogger, S_OK, gConfig, S_ERROR
 from DIRAC.ResourceStatusSystem.Utilities                       import CSHelpers
 from DIRAC.ConfigurationSystem.Client.Helpers import Registry
+from DIRAC.ResourceStatusSystem.Client.ResourceStatusClient import ResourceStatusClient
 from DIRAC.ResourceStatusSystem.Service.PublisherHandler import PublisherHandler as DIRACPublisherHandler
 from BESDIRAC.ResourceStatusSystem.Client.ResourceManagementClient import ResourceManagementClient
 from BESDIRAC.ResourceStatusSystem.Utilities import BESUtils
@@ -20,13 +21,18 @@ from BESDIRAC.ResourceStatusSystem.Utilities import BESUtils
 __RCSID__ = '$Id: $'
 
 # RSS Clients
+rsClient = None
 rmClient = None
 
 def initializePublisherHandler(_serviceInfo):
   """
   Handler initialization in the usual horrible way.
   """
-  
+
+  from DIRAC.ResourceStatusSystem.Service import PublisherHandler
+  PublisherHandler.initializePublisherHandler(_serviceInfo)
+  global rsClient
+  rsClient = ResourceStatusClient() 
   global rmClient 
   rmClient = ResourceManagementClient()
   
@@ -112,7 +118,7 @@ class PublisherHandler(DIRACPublisherHandler):
     """
 
     gLogger.info('getSiteVO')
-    
+
     vos = BESUtils.getSiteVO( siteName )
     return S_OK( vos )
   
@@ -188,7 +194,10 @@ class PublisherHandler(DIRACPublisherHandler):
       if se:
         sitesStorageSummary[ siteName ] = se[ 0 ]
         ses.add(se[ 0 ])
-        
+
+    if len(ses) == 0:
+      return S_OK(sitesStorageSummary)
+   
     queryRes = rmClient.selectStorageCache(sE = list(ses))
     if not queryRes[ 'OK' ]:
       return queryRes
@@ -406,7 +415,7 @@ class PublisherHandler(DIRACPublisherHandler):
       for testRecord in testRecords:
         testDict = dict(zip(testColumns, testRecord))
         samSummary[ elementName ][ testDict[ 'TestType' ] ] = testDict[ 'Status' ]
-              
+
     return S_OK(samSummary)
   
   def __getSitesMaxJobs(self, sites):
@@ -536,3 +545,4 @@ class PublisherHandler(DIRACPublisherHandler):
     
 # ...............................................................................
 # EOF#EOF#EOF#EOF#EOF#EOF#EOF#EOF#EOF#EOF#EOF#EOF#EOF#EOF#EOF#EOF#EOF#EOF#EOF#EOF
+

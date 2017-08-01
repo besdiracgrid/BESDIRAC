@@ -1,6 +1,6 @@
 """ ResourceManagementDB
 
-  ResourceManagementDB forBESDIRAC.
+  ResourceManagementDB for BESDIRAC.
   
 """
 
@@ -22,8 +22,8 @@ class ResourceManagementDB( DIRACResourceManagementClient ):
                                  {
                                   'SE'            : 'VARCHAR(64) NOT NULL',
                                   'Occupied'      : 'BIGINT UNSIGNED NOT NULL DEFAULT 0',
-                                  'Free'      : 'BIGINT UNSIGNED NOT NULL DEFAULT 0',
-                                  'Usage' : 'DOUBLE NOT NULL DEFAULT 0.0',
+                                  'Free'          : 'BIGINT UNSIGNED NOT NULL DEFAULT 0',
+                                  'Usage'         : 'DOUBLE NOT NULL DEFAULT 0.0',
                                   'LastCheckTime' : 'DATETIME NOT NULL'
                                   },
                                  'PrimaryKey' : [ 'SE' ]
@@ -33,7 +33,7 @@ class ResourceManagementDB( DIRACResourceManagementClient ):
                       {
                        'Site'          : 'VARCHAR(64) NOT NULL',
                        'MaskStatus'    : 'VARCHAR(32) NOT NULL',
-                       'Efficiency'    : 'DOUBLE NOT NULL DEFAULT 0.0',
+                       'Efficiency'    : 'DOUBLE NOT NULL DEFAULT 0',
                        'Running'       : 'INTEGER NOT NULL DEFAULT 0',
                        'Waiting'       : 'INTEGER NOT NULL DEFAULT 0',
                        'Done'          : 'INTEGER NOT NULL DEFAULT 0',
@@ -45,14 +45,14 @@ class ResourceManagementDB( DIRACResourceManagementClient ):
                       },
                       'PrimaryKey' : [ 'Site' ]
                                 }
-  
+
   _tablesDB[ 'WorkNodeCache' ] = { 'Fields' :
                               {
-                               'Host' : 'VARCHAR(32) NOT NULL',
-                               'Site' : 'VARCHAR(32) NOT NULL',
-                               'Done' : 'INTEGER NOT NULL DEFAULT 0',
-                               'Failed' : 'INTEGER NOT NULL DEFAULT 0',
-                               'Efficiency' : 'DOUBLE NOT NULL DEFAULT 0.0',
+                               'Host'          : 'VARCHAR(32) NOT NULL',
+                               'Site'          : 'VARCHAR(32) NOT NULL',
+                               'Done'          : 'INTEGER NOT NULL DEFAULT 0',
+                               'Failed'        : 'INTEGER NOT NULL DEFAULT 0',
+                               'Efficiency'    : 'DOUBLE NOT NULL DEFAULT 0.0',
                                'LastCheckTime' : 'DATETIME NOT NULL'
                                },
                               'PrimaryKey' : [ 'Host' ]
@@ -76,11 +76,11 @@ class ResourceManagementDB( DIRACResourceManagementClient ):
 
   _tablesDB[ 'ResourceSAMStatus' ] = { 'Fields' :
                      {
-                       'VO' : 'VARCHAR(8) NOT NULL',
+                       'VO'            : 'VARCHAR(8) NOT NULL', 
                        'ElementName'   : 'VARCHAR(64) NOT NULL',
                        'ElementType'   : 'VARCHAR(16) NOT NULL',
                        'Tests'         : 'VARCHAR(256) NOT NULL DEFAULT ""',
-                       'Status'     : 'VARCHAR(8) NOT NULL DEFAULT ""',
+                       'Status'        : 'VARCHAR(8) NOT NULL DEFAULT ""',
                        'LastCheckTime' : 'DATETIME NOT NULL',
                      },
                      'PrimaryKey' : [ 'VO', 'ElementName' ]
@@ -88,10 +88,10 @@ class ResourceManagementDB( DIRACResourceManagementClient ):
 
   _tablesDB[ 'SiteSAMStatus' ] = { 'Fields' :
                      {
-                       'VO' : 'VARCHAR(8) NOT NULL',
+                       'VO'            : 'VARCHAR(8) NOT NULL',
                        'Site'          : 'VARCHAR(32) NOT NULL',
                        'SiteType'      : 'VARCHAR(8) NOT NULL',
-                       'Status'     : 'VARCHAR(8) NOT NULL DEFAULT ""',
+                       'Status'        : 'VARCHAR(8) NOT NULL DEFAULT ""',
                        'CEStatus'      : 'VARCHAR(8) NOT NULL DEFAULT ""',
                        'SEStatus'      : 'VARCHAR(8) NOT NULL DEFAULT ""',
                        'LastCheckTime' : 'DATETIME NOT NULL',
@@ -119,11 +119,11 @@ class ResourceManagementDB( DIRACResourceManagementClient ):
   _tablesLike[ 'ResourceSAMStatusWithID' ] = { 'Fields' :
                      {
                        'ID'            : 'BIGINT UNSIGNED AUTO_INCREMENT NOT NULL',
-                       'VO' : 'VARCHAR(8) NOT NULL',
+                       'VO'            : 'VARCHAR(8) NOT NULL',
                        'ElementName'   : 'VARCHAR(64) NOT NULL',
                        'ElementType'   : 'VARCHAR(16) NOT NULL',
                        'Tests'         : 'VARCHAR(256) NOT NULL DEFAULT ""',
-                       'Status'     : 'VARCHAR(8) NOT NULL DEFAULT ""',
+                       'Status'        : 'VARCHAR(8) NOT NULL DEFAULT ""',
                        'LastCheckTime' : 'DATETIME NOT NULL',
                      },
                      'PrimaryKey' : [ 'ID' ]
@@ -132,10 +132,10 @@ class ResourceManagementDB( DIRACResourceManagementClient ):
   _tablesLike[ 'SiteSAMStatusWithID' ] = { 'Fields' :
                      {
                        'ID'            : 'BIGINT UNSIGNED AUTO_INCREMENT NOT NULL',
-                       'VO' : 'VARCHAR(8) NOT NULL',
+                       'VO'            : 'VARCHAR(8) NOT NULL',
                        'Site'          : 'VARCHAR(32) NOT NULL',
                        'SiteType'      : 'VARCHAR(8) NOT NULL',
-                       'Status'     : 'VARCHAR(8) NOT NULL DEFAULT ""',
+                       'Status'        : 'VARCHAR(8) NOT NULL DEFAULT ""',
                        'CEStatus'      : 'VARCHAR(8) NOT NULL DEFAULT ""',
                        'SEStatus'      : 'VARCHAR(8) NOT NULL DEFAULT ""',
                        'LastCheckTime' : 'DATETIME NOT NULL',
@@ -144,9 +144,9 @@ class ResourceManagementDB( DIRACResourceManagementClient ):
                                 }
 
   _likeToTable.update( {
-                   'SAMResultLog'     : 'SAMResultWithID',
-                   'ResourceSAMStatusLog' : 'ResourceSAMStatusWithID',
-                   'SiteSAMStatusLog' : 'SiteSAMStatusWithID',
+                   'SAMResultLog'             : 'SAMResultWithID',
+                   'ResourceSAMStatusLog'     : 'ResourceSAMStatusWithID',
+                   'SiteSAMStatusLog'         : 'SiteSAMStatusWithID',
                   } )
   
   
@@ -167,9 +167,10 @@ class ResourceManagementDB( DIRACResourceManagementClient ):
         return updateRes
                     
       params = dict( zip( updateRes[ 'Columns' ], updateRes[ 'Value' ][ 0 ] )) 
-          
+
     meta[ 'table' ] += 'Log'
 
     logRes = self.insert( params, meta )
     
     return logRes
+

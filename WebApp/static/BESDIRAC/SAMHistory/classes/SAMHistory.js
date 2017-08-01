@@ -141,7 +141,7 @@ Ext.define('BESDIRAC.SAMHistory.classes.SAMHistory', {
 					}
 				});
 
-		me.cmbElement = Ext.create('Ext.form.field.ComboBox', {
+		me.cmbElement = Ext.create('Ext.dirac.utils.DiracBoxSelect', {
 					id : 'element_cmb',
 					name : 'elements',
 					fieldLabel : "Element",
@@ -153,7 +153,7 @@ Ext.define('BESDIRAC.SAMHistory.classes.SAMHistory', {
 					store : elementStore
 				});
 
-		me.cmbVO = Ext.create('Ext.dirac.utils.DiracBoxSelect', {
+		me.cmbVO = Ext.create('Ext.form.field.ComboBox', {
 					id : 'vo_cmb',
 					name : 'vo',
 					fieldLabel : 'VO',
@@ -549,7 +549,7 @@ Ext.define('BESDIRAC.SAMHistory.classes.SAMHistory', {
 			Ext.MessageBox.alert('warn', 'Please chose one element!');
 			return null;
 		}
-		
+
 		var vo = me.cmbVO.getValue();
 
 		var timeSpan = me.cmbTimeSpan.getValue();

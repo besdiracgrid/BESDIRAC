@@ -6,7 +6,7 @@
 
 import os, time
 from datetime                                           import datetime
-from DIRAC                                              import S_OK
+from DIRAC                                              import S_OK, S_ERROR
 from DIRAC.DataManagementSystem.Client.DataManager      import DataManager
 from BESDIRAC.ResourceStatusSystem.SAM.SAMTest.TestBase import TestBase
 from BESDIRAC.ResourceStatusSystem.SAM.SAMTest.TestBase import LOCK
@@ -21,6 +21,7 @@ class SETest( TestBase ):
   def __init__( self, args = None, apis = None ):
     super( SETest, self ).__init__( args, apis )
     
+    self.timeout = self.args.get( 'timeout', 60 )
     self.__lfnPath = '/bes/user/z/zhaoxh/'
     self.__testFile = 'test.dat'
     self.__localPath = '/tmp/'
@@ -35,7 +36,7 @@ class SETest( TestBase ):
     """
       Test upload and download for specified SE.
     """
-    
+
     elementName = elementDict[ 'ElementName' ]
 
     testFilePath = self.__localPath + self.__testFile
@@ -48,8 +49,8 @@ class SETest( TestBase ):
     log = ''
     lfnPath = self.__lfnPath + elementName + '-' + self.__testFile
     submissionTime = datetime.utcnow().replace( microsecond = 0 )
-    
-    LOCK.acquire()
+
+    LOCK.acquire()   
     start = time.time()
     result = self.dm.putAndRegister( lfnPath, testFilePath, elementName )
     uploadTime = time.time() - start
@@ -80,16 +81,19 @@ class SETest( TestBase ):
       
     completionTime = datetime.utcnow().replace( microsecond = 0 )
     applicationTime = ( completionTime - submissionTime ).total_seconds()
-    
-    result = { 'Result' : { 'Status' : status,
-                           'Log' : log,
-                           'SubmissionTime' : submissionTime,
-                           'CompletionTime' : completionTime,
-                           'ApplicationTime' : applicationTime },
-              'Finish' : True }
 
+    result = { 'Result' : { 'Status' : status,
+                            'Log' : log,
+                            'SubmissionTime' : submissionTime,
+                            'CompletionTime' : completionTime,
+                            'ApplicationTime' : applicationTime },
+               'Finish' : True }
+
+#    if os.path.exists( testFilePath ) and os.path.isfile( testFilePath ):
+#      os.remove( testFilePath )
     localFile = self.__localPath + elementName +'-' + self.__testFile
     if os.path.exists( localFile ) and os.path.isfile( localFile ):
       os.remove( localFile )
       
     return S_OK( result )
+

@@ -108,7 +108,7 @@ class SAMHistoryHandler(WebHandler):
         if status == 'OK' or status == 'Busy':
           okNum += 1
       okRate = math.floor((float(okNum) / len(historyList)) * 10000) / 100
-      summaryData.append(( element, okNum ))
+      summaryData.append(( element, okRate ))
       
     summaryData.sort(key = lambda e : e[ 0 ])
     elements = [ e[0] for e in summaryData ]

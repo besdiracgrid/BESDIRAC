@@ -7,7 +7,7 @@
 """
 
 from datetime import datetime
-from DIRAC                                                         import S_OK, S_ERROR, gLogger
+from DIRAC                                                         import S_OK, S_ERROR
 from BESDIRAC.ResourceStatusSystem.Client.ResourceManagementClient import ResourceManagementClient
 
 
@@ -32,8 +32,6 @@ class StatusEvaluator(object):
          the sites to evaluate SAM status. The sites is grouped by domain.
     """
     
-    self.log = gLogger.getSubLogger( 'StatusEvaluator' )
-
     if "ResourceManagementClient" in apis:
       self.rmClient = apis[ "ResourceManagementClient" ]
     else:
@@ -88,10 +86,8 @@ class StatusEvaluator(object):
       ceStatus = 'Busy'
     elif 'Bad' in ceStatusList:
       ceStatus = 'Bad'
-    elif 'Unknown' in ceStatusList:
-      ceStatus = 'Unknown'
     else:
-      ceStatus = None
+      ceStatus = 'Unknown'
 
     if not seStatus:
       status = ceStatus

@@ -64,16 +64,20 @@ class TestExecutor( object ):
       for name, value in matchArgs.items():
         if not value:
           continue
-      
-        if not testMatchArgs.has_key( name ):
-          continue
 
         if type( value ) == str:
           value = ( value, )
 
+        if not testMatchArgs.has_key( name ):
+          continue
+
+        target = testMatchArgs[ name ]
+        if type( target ) == str:
+          target = ( target, )
+
         match = False
         for val in value:
-          if val in testMatchArgs[ name ]:
+          if val in target:
             match = True
             break
         
@@ -184,3 +188,4 @@ class TestExecutor( object ):
     for testType, testDict in testResults.items():
       testsStatus[ testType ] = testDict[ 'Status' ]
     return S_OK( testsStatus )
+

@@ -37,6 +37,7 @@ class StorageCommand( Command ):
     """
     
     for storageDict in result:
+      print storageDict
       resQuery = self.rmClient.addOrModifyStorageCache( sE = storageDict[ 'SE' ],
                                                         occupied = storageDict[ 'Occupied' ],
                                                         free = storageDict[ 'Free' ],
@@ -57,7 +58,7 @@ class StorageCommand( Command ):
     for se in ses:
       maxStorage = gConfig.getValue('/Resources/StorageElements/%s/Capacity' % se, 0) * 1 << 40
       seMaxStorage[ se ] = maxStorage
-        
+
     sqlStr = """select SE.SEName, sum(F.Size) from 
     FC_Replicas R, FC_Files F, FC_StorageElements SE 
     where R.FileID=F.FileID and R.SEID=SE.SEID 
@@ -80,10 +81,10 @@ class StorageCommand( Command ):
         usage = 0.0
         free = 0
       else:
-        usage = math.floor(float(occupied) / max * 1000) / 10
+	usage = math.floor(float(occupied) / max * 1000) / 10
         free = max - occupied
       uniformResult.append( { 'SE' : se, 'Occupied' : occupied, 'Free' : free, 'Usage' : usage } )
-            
+
     storeRes = self._storeCommand( uniformResult )
     if not storeRes[ 'OK' ]:
       return storeRes
@@ -107,4 +108,3 @@ class StorageCommand( Command ):
       self.metrics[ 'failed' ].append( storageResults[ 'Message' ] )
             
     return S_OK( self.metrics )
-    

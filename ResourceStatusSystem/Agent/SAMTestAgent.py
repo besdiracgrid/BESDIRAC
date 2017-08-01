@@ -15,7 +15,6 @@ from DIRAC.ResourceStatusSystem.Utilities import Utils
 from BESDIRAC.ResourceStatusSystem.Client.ResourceManagementClient import ResourceManagementClient
 from BESDIRAC.ResourceStatusSystem.SAM.TestExecutor                import TestExecutor
 from BESDIRAC.ResourceStatusSystem.SAM.StatusEvaluator             import StatusEvaluator
-from BESDIRAC.ResourceStatusSystem.SAM.SAMTest import TestConfiguration
 from BESDIRAC.ResourceStatusSystem.Utilities import BESUtils
 
 
@@ -43,14 +42,9 @@ class SAMTestAgent(AgentModule):
       specify the tests which need to be executed.
     """
     
-    self.tests = TestConfiguration.TESTS
-    self.__loadTestObj()
 
     self.apis[ 'DataManager' ] = DataManager()
     self.apis[ 'ResourceManagementClient' ] = ResourceManagementClient()
-    
-    self.testExecutor = TestExecutor( self.tests, self.apis )
-    self.statusEvaluator = StatusEvaluator( self.apis )    
     
     return S_OK()
         
@@ -61,7 +55,14 @@ class SAMTestAgent(AgentModule):
       evaluated from CS. Then it instantiates TestExecutor and StatusEvaluate and 
       calls their main method to finish all the work.
     """
-    
+
+    from BESDIRAC.ResourceStatusSystem.SAM.SAMTest import TestConfiguration
+    self.tests = TestConfiguration.TESTS
+    self.__loadTestObj()
+
+    self.testExecutor = TestExecutor( self.tests, self.apis )
+    self.statusEvaluator = StatusEvaluator( self.apis )
+
     elements = []
     sitesCEs = {}
 
@@ -69,12 +70,13 @@ class SAMTestAgent(AgentModule):
     for se in ses.split( ', ' ):
       elements.append( { 'ElementName' : se, 
                                               'ElementType' : 'StorageElement' } )    
-    
+
+    noTestSites = [ site.strip() for site in self.am_getOption( 'noTestSite', '' ).split( ',' ) if site != '' ]
     wmsAdmin = RPCClient('WorkloadManagement/WMSAdministrator')
     activeSites = wmsAdmin.getSiteMask()
     if not activeSites[ 'OK' ]:
       return activeSites
-    activeSites = activeSites[ 'Value' ]
+    activeSites = [ site for site in activeSites[ 'Value' ] if site not in noTestSites ]
 
     for siteName in activeSites:
       domain = siteName.split('.')[ 0 ]
@@ -87,7 +89,7 @@ class SAMTestAgent(AgentModule):
                                                   'ElementType' : 'ComputingElement',
                                                   'VO' : vos } )
       else:
-        sitesCEs[ siteName ] = [ siteName ] 
+        sitesCEs[ siteName ] = [ siteName ]
         elements.append( { 'ElementName' : siteName,
                                                 'ElementType' : 'CLOUD',
                                                 'VO' : vos } )
@@ -190,3 +192,4 @@ class SAMTestAgent(AgentModule):
       testClass = getattr( testModule, moduleName )
       obj = testClass(args, self.apis)
       testDict[ 'object' ] = obj
+

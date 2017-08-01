@@ -65,8 +65,10 @@ class CEBaseTest( TestBase ):
         
     if self.vo:
       submitVO = self.vo
-    else:
+    elif vos:
       submitVO = vos[ 0 ]
+    else:
+      submitVO = 'bes'
 
     submissionTime = datetime.utcnow().replace( microsecond = 0 )
     sendRes = self.__submit( site, ce, submitVO )

@@ -58,7 +58,8 @@ def getSiteVO( siteName ):
         if images[ 'OK' ]:
           for image in images[ 'Value' ]:
             vo = gConfig.getValue( '%s/CLOUD/%s/Cloud/%s/Images/%s/VO' % ( _basePath, siteName, cloud, image ) )
-            vos.append( vo )
+            if vo:
+              vos.append( vo )
     if vos:
       return list( set( vos ) )
 
