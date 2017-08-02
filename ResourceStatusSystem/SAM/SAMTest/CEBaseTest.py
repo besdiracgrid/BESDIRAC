@@ -1,6 +1,6 @@
 """ CEBaseTest
 
-  Base class for all the CE test classes. 
+  Base class for all the CE test classes.
 
 """
 
@@ -22,14 +22,14 @@ __RCSID__ = '$Id: $'
 
 
 class CEBaseTest( TestBase ):
-  """ 
-    CEBaseTest is base class for all the CE test classes. Real  CE test should
-    implement its _judge method. 
   """
-    
+    CEBaseTest is base class for all the CE test classes. Real  CE test should
+    implement its _judge method.
+  """
+
   def __init__( self, args = None, apis = None ):
     super( CEBaseTest, self ).__init__( args, apis )
-      
+
     self.timeout = self.args.get( 'timeout', 1800 )
     self.vo = self.args.get( 'VO' )
     self.testType = self.args[ 'TestType' ]
@@ -39,12 +39,12 @@ class CEBaseTest( TestBase ):
 
     if 'WMSAdministrator' in self.apis:
       self.wmsAdmin = self.apis[ 'WMSAdministrator' ]
-    else:  
+    else:
       self.wmsAdmin = RPCClient( 'WorkloadManagement/WMSAdministrator' )
 
     if 'Dirac' in self.apis:
       self.dirac = self.apis[ 'Dirac' ]
-    else:  
+    else:
       self.dirac = Dirac()
 
 
@@ -52,17 +52,17 @@ class CEBaseTest( TestBase ):
     """
       submit test job to the specified ce or cloud..
     """
-    
+
     elementName = elementDict[ 'ElementName' ]
     elementType = elementDict[ 'ElementType' ]
     vos = elementDict[ 'VO' ]
-    
+
     site = None; ce = None
     if elementType == 'ComputingElement':
       ce = elementName
     if elementType == 'CLOUD':
       site = elementName
-        
+
     if self.vo:
       submitVO = self.vo
     elif vos:
@@ -75,20 +75,20 @@ class CEBaseTest( TestBase ):
     if not sendRes[ 'OK' ]:
       return sendRes
     jobID = sendRes[ 'Value' ]
-    
+
     result = { 'Result' : { 'JobID' : jobID,
                            'VO' : submitVO,
-                           'SubmissionTime' : submissionTime }, 
+                           'SubmissionTime' : submissionTime },
               'Finish' : False }
-    
+
     return S_OK( result )
-    
-    
+
+
   def __submit( self, site, CE, vo ):
     """
       set the job and submit.
     """
-    
+
     job = Job()
     job.setName( self.testType )
     job.setJobGroup( 'CE-Test' )
@@ -102,6 +102,7 @@ class CEBaseTest( TestBase ):
     LOCK.acquire()
     proxyPath = BESUtils.getProxyByVO( 'yant', vo )
     if not proxyPath[ 'OK' ]:
+      LOCK.release()
       return proxyPath
     proxyPath = proxyPath[ 'Value' ]
     oldProxy = os.environ.get( 'X509_USER_PROXY' )
@@ -114,24 +115,24 @@ class CEBaseTest( TestBase ):
     LOCK.release()
 
     return result
-    
-    
+
+
   def getTestResult( self, elementName, vo, jobID, submissionTime ):
     """
-      download output sandbox and judge the test status from the log file. 
+      download output sandbox and judge the test status from the log file.
     """
-    
+
     isFinish = False
-    
+
     res = self.__getJobOutput( jobID, vo )
     if not res[ 'OK' ]:
       return res
     output = res[ 'Value' ]
     status = res[ 'Status' ]
-    
+
     resDict = { 'CompletionTime' : None, 'Status' : None, 'Log' : None, 'ApplicationTime' : None }
     utcNow = datetime.utcnow().replace( microsecond = 0 )
-    
+
     if output:
       isFinish = True
       resDict[ 'CompletionTime' ] = utcNow
@@ -169,7 +170,7 @@ class CEBaseTest( TestBase ):
             resDict[ 'Status' ] = 'Unknown'
             resDict[ 'Log' ] = 'Test did not complete within the timeout of %d seconds, job status is %s' % ( self.timeout, status )
         self.dirac.kill( jobID )
-    
+
     if not isFinish:
       return S_OK()
     else:
@@ -181,11 +182,12 @@ class CEBaseTest( TestBase ):
     if not status[ 'OK' ]:
       return status
     status = status[ 'Value' ][ jobID ][ 'Status' ]
-  
+
     if status in ( 'Done', 'Failed' ):
       LOCK.acquire()
       proxyPath = BESUtils.getProxyByVO( 'yant', vo )
       if not proxyPath[ 'OK' ]:
+        LOCK.release()
         return proxyPath
       proxyPath = proxyPath[ 'Value' ]
       oldProxy = os.environ.get( 'X509_USER_PROXY' )
@@ -210,7 +212,7 @@ class CEBaseTest( TestBase ):
         ret = S_OK( { 'Download' : True, 'Log' : log } )
     else:
       ret = S_OK()
-    
+
     ret[ 'Status' ] = status
     return ret
 
@@ -223,14 +225,14 @@ class CEBaseTest( TestBase ):
       runtime += log[ index ]
       index += 1
     runtime = float( runtime[ len( 'Running Time :'  ) : ].strip() )
-        
+
     return runtime
-        
-        
+
+
   @staticmethod
   def _judge( log ):
     """
       to be extended by real ce tests.
     """
-    
+
     return 'OK'

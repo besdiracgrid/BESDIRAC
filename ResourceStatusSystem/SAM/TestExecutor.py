@@ -8,7 +8,7 @@
 import Queue
 from datetime import datetime
 from DIRAC                                                         import S_OK, S_ERROR, gLogger
-from BESDIRAC.ResourceStatusSystem.Client.ResourceManagementClient import ResourceManagementClient
+from BESDIRAC.ResourceStatusSystem.Client.ResourceManagementIHEPClient import ResourceManagementIHEPClient
 
 
 __RCSID__ = '$Id:  $'
@@ -47,17 +47,17 @@ class TestExecutor( object ):
     self.__tests = tests
     self.log = gLogger.getSubLogger( 'TestExecutor' )
 
-    if 'ResourceManagementClient' in self.apis:
-      self.rmClient = self.apis[ 'ResourceManagementClient' ]
+    if 'ResourceManagementIHEPClient' in self.apis:
+      self.rmClient = self.apis[ 'ResourceManagementIHEPClient' ]
     else:
-      self.rmClient = ResourceManagementClient()
+      self.rmClient = ResourceManagementIHEPClient()
 
 
   def __matchTests( self, matchArgs ):
     execTests = []
 
     for testType, testDict in self.__tests.items():
-           
+
       testMatchArgs = testDict[ 'match' ]
 
       match = True
@@ -80,10 +80,10 @@ class TestExecutor( object ):
           if val in target:
             match = True
             break
-        
+
         if not match:
           break
-      
+
       if match:
         execTests.append( testType )
 
@@ -124,15 +124,15 @@ class TestExecutor( object ):
 
     examples:
       >>> executor.execute()[ 'Value' ]
-          { 'Records' : ( ( 'chenj01.ihep.ac.cn', 'WMS-Test', 'ComputingElement', 'OK', 
+          { 'Records' : ( ( 'chenj01.ihep.ac.cn', 'WMS-Test', 'ComputingElement', 'OK',
                                        'balabala', 1, '2016-5-8 00:00:00', '2016-5-8 00:05:23', 0.1234 ),
-                                    ( 'chenj01.ihep.ac.cn', 'BOSS-Test', 'ComputingElement', 'Bad', 
+                                    ( 'chenj01.ihep.ac.cn', 'BOSS-Test', 'ComputingElement', 'Bad',
                                        'balabala', 2, '2016-5-8 00:00:00', '0000-0-0', 0 ),
-                                    ( 'IHEPD-USER', 'SE-Test', 'StorageElement', 'Bad', 
+                                    ( 'IHEPD-USER', 'SE-Test', 'StorageElement', 'Bad',
                                       'balabala', None, '2016-5-8 00:00:00', '0000-0-0', 0 ) ),
              'Columns' : ( 'ElementName', 'TestType', 'ElementType', 'Status',
                                       'Log', 'JobID', 'SubmissionTime', 'CompletionTime', 'ApplicationTime' ) }
-    
+
     :return: S_OK( { 'Records' : `tuple`, 'Columns' : `tuple` } ) / S_ERROR
     """
 
@@ -159,7 +159,7 @@ class TestExecutor( object ):
       testResults[ testType ] = result[ 'Result' ]
       if not result[ 'Finish' ]:
         runningTestsQueue.put( testType )
-        
+
     while not runningTestsQueue.empty():
       testType = runningTestsQueue.get_nowait()
       testObj = self.__tests[ testType ][ 'object' ]
@@ -179,13 +179,12 @@ class TestExecutor( object ):
       runningTestsQueue.task_done()
 
     runningTestsQueue.join()
-    
+
     storeRes = self.__storeTestResults( elementName, elementType, testResults )
     if not storeRes[ 'OK' ]:
-      return S_ERROR( 'Failed to store SAM test results.' )
+      return S_ERROR( 'Failed to store SAM test results: %s' % storeRes[ 'Message' ] )
 
     testsStatus = {}
     for testType, testDict in testResults.items():
       testsStatus[ testType ] = testDict[ 'Status' ]
     return S_OK( testsStatus )
-

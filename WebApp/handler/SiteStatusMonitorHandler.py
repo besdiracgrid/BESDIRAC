@@ -10,7 +10,7 @@ class SiteStatusMonitorHandler( WebHandler ):
 
   @asyncGen
   def web_getSelectionData( self ):
-    publisher = RPCClient( 'ResourceStatus/Publisher' )
+    publisher = RPCClient( 'ResourceStatus/PublisherIHEP' )
 
     callback = {}
     ret = { 'success' : 'true', 'result' : callback }
@@ -57,7 +57,7 @@ class SiteStatusMonitorHandler( WebHandler ):
 
   @asyncGen
   def web_getMainData( self ):
-    publisher = RPCClient( 'ResourceStatus/Publisher' )
+    publisher = RPCClient( 'ResourceStatus/PublisherIHEP' )
 
     sitesDict = {}
 
@@ -141,7 +141,7 @@ class SiteStatusMonitorHandler( WebHandler ):
 
   @asyncGen        
   def web_getSAMData( self ):
-    publisher = RPCClient( 'ResourceStatus/Publisher' )
+    publisher = RPCClient( 'ResourceStatus/PublisherIHEP' )
 
     req = self._request()
     site = req[ 'Site' ][ -1 ].encode()
@@ -171,7 +171,7 @@ class SiteStatusMonitorHandler( WebHandler ):
 
   @asyncGen
   def web_getSAMDetail( self ):
-    publisher = RPCClient( 'ResourceStatus/Publisher' )
+    publisher = RPCClient( 'ResourceStatus/PublisherIHEP' )
 
     elementName = self.request.arguments[ 'elementName' ][ -1 ]
     testType = self.request.arguments[ 'testType' ][ -1 ]
@@ -195,7 +195,7 @@ class SiteStatusMonitorHandler( WebHandler ):
 
   @asyncGen        
   def web_getWorkNodeData( self ):
-    publisher = RPCClient( 'ResourceStatus/Publisher' )
+    publisher = RPCClient( 'ResourceStatus/PublisherIHEP' )
 
     req = self._request()
     site = req[ 'Site' ][ -1 ].encode()
@@ -285,7 +285,7 @@ class SiteStatusMonitorHandler( WebHandler ):
 
 
   def __getSitesVO( self, sitesName ):
-    publisher = RPCClient( 'ResourceStatus/Publisher' )
+    publisher = RPCClient( 'ResourceStatus/PublisherIHEP' )
 
     sitesVO = {}
 

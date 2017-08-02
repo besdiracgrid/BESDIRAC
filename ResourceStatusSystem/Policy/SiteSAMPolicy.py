@@ -54,7 +54,7 @@ class SiteSAMPolicy( PolicyBase ):
           result[ 'Reason' ] = 'CEs have some problems'
         else:
           result[ 'Status' ] = 'Degraded'
-          result[ 'Reason' ] = 'CEs can not run the %s jobs properly' % proVOs 
+          result[ 'Reason' ] = 'CEs can not run the %s jobs properly' % proVOs
         proVOs = ', '.join( proVOs )
       else:
         result[ 'Status' ] = 'Degraded'

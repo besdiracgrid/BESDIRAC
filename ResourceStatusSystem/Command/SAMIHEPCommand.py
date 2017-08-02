@@ -1,20 +1,20 @@
 from datetime import datetime, timedelta
 from DIRAC import S_OK, S_ERROR
 from DIRAC.ResourceStatusSystem.Command.Command                 import Command
-from BESDIRAC.ResourceStatusSystem.Client.ResourceManagementClient import ResourceManagementClient
+from BESDIRAC.ResourceStatusSystem.Client.ResourceManagementIHEPClient import ResourceManagementIHEPClient
 
 __RCSID__ = '$Id:  $'
 
-class SAMCommand( Command ):
+class SAMIHEPCommand( Command ):
 
   def __init__( self, args = None, clients = None ):
 
-    super( SAMCommand, self ).__init__( args, clients )
+    super( SAMIHEPCommand, self ).__init__( args, clients )
 
-    if 'ResourceManagementClient' in self.apis:
-      self.rmClient = self.apis[ 'ResourceManagementClient' ]
+    if 'ResourceManagementIHEPClient' in self.apis:
+      self.rmIHEPClient = self.apis[ 'ResourceManagementIHEPClient' ]
     else:
-      self.rmClient = ResourceManagementClient()
+      self.rmIHEPClient = ResourceManagementClient()
 
 
   def doCommand( self ):
@@ -24,10 +24,10 @@ class SAMCommand( Command ):
     lastCheckTime = datetime.utcnow().replace(microsecond = 0) - timedelta(hours = 24)
 
     if element == 'Site':
-      queryRes = self.rmClient.selectSiteSAMStatus( site = elementName,
+      queryRes = self.rmIHEPClient.selectSiteSAMStatus( site = elementName,
                                                     meta = { 'newer' : [ 'LastCheckTime', lastCheckTime ] } )
     elif element == 'Resource':
-      queryRes = self.rmClient.selectResourceSAMStatus( elementName = elementName,
+      queryRes = self.rmIHEPClient.selectResourceSAMStatus( elementName = elementName,
                                                         meta = { 'newer' : [ 'LastCheckTime', lastCheckTime ] } )
     else:
       return self.returnERROR( S_ERROR('No SAM information for %s element' % element ) )

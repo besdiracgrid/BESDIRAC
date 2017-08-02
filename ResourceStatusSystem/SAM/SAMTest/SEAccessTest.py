@@ -22,5 +22,5 @@ class SEAccessTest:
 
     host = gConfig.getValue( '%s/%s/AccessProtocol.1/Host' % ( _basePath, element ), '' )
     port = gConfig.getValue( '%s/%s/AccessProtocol.1/Port' % ( _basePath, element ), '' )
-    
+
     return S_OK( ( host, port ) )

@@ -8,7 +8,7 @@
 
 from datetime import datetime
 from DIRAC                                                         import S_OK, S_ERROR
-from BESDIRAC.ResourceStatusSystem.Client.ResourceManagementClient import ResourceManagementClient
+from BESDIRAC.ResourceStatusSystem.Client.ResourceManagementIHEPClient import ResourceManagementIHEPClient
 
 
 __RCSID__ = '$Id:  $'
@@ -17,31 +17,31 @@ __RCSID__ = '$Id:  $'
 class StatusEvaluator(object):
   """ StatusEvaluator
   """
-    
+
   def __init__(self, apis):
     """ Constructor
-    
+
     examples:
       >>> sites = { 'CLUSTER' : [ 'CLUSTER.USTC.cn' ],
                               'GRID' : [ 'GRID.JINR.ru' ],
                               'CLOUD' : [ ''CLOUD.IHEP-OPENSTACK.cn' ] }
       >>> evaluator = StatusEvaluator( sites )
-    
+
     :Parameters:
        **sites** - `dict`
          the sites to evaluate SAM status. The sites is grouped by domain.
     """
-    
-    if "ResourceManagementClient" in apis:
-      self.rmClient = apis[ "ResourceManagementClient" ]
+
+    if "ResourceManagementIHEPClient" in apis:
+      self.rmClient = apis[ "ResourceManagementIHEPClient" ]
     else:
-      self.rmClient = ResourceManagementClient()
+      self.rmClient = ResourceManagementIHEPClient()
 
 
   def __storeResourceStatus( self, resDict ):
     storeRes = self.rmClient.addOrModifyResourceSAMStatus(
-                                                          resDict['VO' ] , 
-                                                          resDict[ 'ElementName' ], 
+                                                          resDict[ 'VO' ],
+                                                          resDict[ 'ElementName' ],
                                                           resDict[ 'ElementType' ],
                                                           resDict[ 'Tests' ],
                                                           resDict[ 'Status' ],
@@ -77,8 +77,8 @@ class StatusEvaluator(object):
     if 'OK' in statusList:
       return 'OK'
     return ''
-  
-  
+
+
   def __siteStatusRule( self, ceStatusList, seStatus ):
     if 'OK' in ceStatusList:
       ceStatus = 'OK'
@@ -96,7 +96,7 @@ class StatusEvaluator(object):
         status = 'Bad'
       else:
         status = ceStatus
-      
+
     return ( status, ceStatus, seStatus )
 
 

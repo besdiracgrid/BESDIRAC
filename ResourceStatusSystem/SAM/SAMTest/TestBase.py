@@ -1,7 +1,7 @@
 """ TestBase
 
   Base class for all tests.
-  
+
 """
 
 import threading
@@ -18,9 +18,9 @@ class TestBase( object ):
     TestBase is a simple base class for all tests. Real test classes should
     implement its doTest and getTestResult method.
   """
-  
+
   __metaclass__ = ABCMeta
-    
+
   def __init__( self, args = None, apis = None ):
     self.apis = apis or {}
     self.args = args or {}

@@ -8,10 +8,10 @@ commands = """
 wget http://cvmfs.ihep.ac.cn/pub/cepc/cepc_test_job.tgz
 tar xvfz cepc_test_job.tgz
 cd cepc_test_job
-echo 
+echo
 echo Job Start
-./simu.sh 
-echo 
+./simu.sh
+echo
 if [ $? -eq 0 ]; then
     echo Job Done.
 else

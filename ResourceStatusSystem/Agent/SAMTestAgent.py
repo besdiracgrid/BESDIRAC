@@ -12,7 +12,7 @@ from DIRAC.Core.DISET.RPCClient                        import RPCClient
 from DIRAC.ResourceStatusSystem.Utilities              import CSHelpers
 from DIRAC.DataManagementSystem.Client.DataManager                 import DataManager
 from DIRAC.ResourceStatusSystem.Utilities import Utils
-from BESDIRAC.ResourceStatusSystem.Client.ResourceManagementClient import ResourceManagementClient
+from BESDIRAC.ResourceStatusSystem.Client.ResourceManagementIHEPClient import ResourceManagementIHEPClient
 from BESDIRAC.ResourceStatusSystem.SAM.TestExecutor                import TestExecutor
 from BESDIRAC.ResourceStatusSystem.SAM.StatusEvaluator             import StatusEvaluator
 from BESDIRAC.ResourceStatusSystem.Utilities import BESUtils
@@ -24,35 +24,35 @@ AGENT_NAME = 'ResourceStatus/SAMTestAgent'
 
 class SAMTestAgent(AgentModule):
   """ SAMTestAgent
-  
+
     The SAMTestAgent is used to execute SAM tests and evaluate SAM status
     periodically. It executes tests with TestExecutor and evaluates status with
     StatusEvaluator.
   """
-    
+
   def __init__(self, *args, **kwargs):
     AgentModule.__init__(self, *args, **kwargs)
-        
+
     self.tests = {}
     self.apis = {}
-         
-         
+
+
   def initialize(self):
-    """ 
+    """
       specify the tests which need to be executed.
     """
-    
+
 
     self.apis[ 'DataManager' ] = DataManager()
-    self.apis[ 'ResourceManagementClient' ] = ResourceManagementClient()
-    
+    self.apis[ 'ResourceManagementIHEPClient' ] = ResourceManagementIHEPClient()
+
     return S_OK()
-        
-        
+
+
   def execute(self):
-    """ 
-      The main method of the agent. It get elements which need to be tested and 
-      evaluated from CS. Then it instantiates TestExecutor and StatusEvaluate and 
+    """
+      The main method of the agent. It get elements which need to be tested and
+      evaluated from CS. Then it instantiates TestExecutor and StatusEvaluate and
       calls their main method to finish all the work.
     """
 
@@ -68,8 +68,8 @@ class SAMTestAgent(AgentModule):
 
     ses = gConfig.getValue( 'Resources/StorageElementGroups/SE-USER' )
     for se in ses.split( ', ' ):
-      elements.append( { 'ElementName' : se, 
-                                              'ElementType' : 'StorageElement' } )    
+      elements.append( { 'ElementName' : se,
+                                              'ElementType' : 'StorageElement' } )
 
     noTestSites = [ site.strip() for site in self.am_getOption( 'noTestSite', '' ).split( ',' ) if site != '' ]
     wmsAdmin = RPCClient('WorkloadManagement/WMSAdministrator')
@@ -85,7 +85,7 @@ class SAMTestAgent(AgentModule):
         siteCEs = CSHelpers.getSiteComputingElements( siteName )
         sitesCEs[ siteName ] = siteCEs
         for ce in siteCEs:
-          elements.append( { 'ElementName' : ce, 
+          elements.append( { 'ElementName' : ce,
                                                   'ElementType' : 'ComputingElement',
                                                   'VO' : vos } )
       else:
@@ -93,7 +93,7 @@ class SAMTestAgent(AgentModule):
         elements.append( { 'ElementName' : siteName,
                                                 'ElementType' : 'CLOUD',
                                                 'VO' : vos } )
-        
+
     lastCheckTime = datetime.utcnow().replace(microsecond = 0)
     self.elementsStatus = {}
 
@@ -102,7 +102,7 @@ class SAMTestAgent(AgentModule):
       t = threading.Thread( target = self._execute, args = ( elementDict, ) )
       threads.append( t )
       t.start()
-      
+
     for thread in threads:
       thread.join()
 
@@ -124,7 +124,7 @@ class SAMTestAgent(AgentModule):
           if vo not in voStatus:
             voStatus[ vo ] = []
           voStatus[ vo ].append( status )
-          
+
       for vo, ceStatusList in voStatus.items():
         if ceStatusList == [] and seStatus == None:
           continue
@@ -132,7 +132,7 @@ class SAMTestAgent(AgentModule):
         if not res[ 'OK' ]:
           gLogger.error( 'StatusEvaluator.evaluateSiteStatus: %s' % res[ 'Message' ] )
           break
-        
+
     return S_OK()
 
 
@@ -146,7 +146,7 @@ class SAMTestAgent(AgentModule):
       gLogger.error( 'TestExecutor.execute: %s' % testRes[ 'Message' ] )
       return
     testsStatus = testRes[ 'Value' ]
-    
+
     defaultTestsStatus = {}
     voTestsStatus = {}
     for vo in vos:
@@ -157,7 +157,7 @@ class SAMTestAgent(AgentModule):
         defaultTestsStatus[ testType ] = status
       else:
         voTestsStatus[ vo ][ testType ] = status
-    
+
     elementStatus = {}
     self.elementsStatus[ elementName ] = elementStatus
 
@@ -192,4 +192,3 @@ class SAMTestAgent(AgentModule):
       testClass = getattr( testModule, moduleName )
       obj = testClass(args, self.apis)
       testDict[ 'object' ] = obj
-

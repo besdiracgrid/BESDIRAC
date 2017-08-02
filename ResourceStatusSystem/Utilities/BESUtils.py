@@ -7,17 +7,17 @@ from DIRAC.ConfigurationSystem.Client.Helpers import Registry
 
 def getProxyByVO( user, vo ):
   group = vo.lower() + '_user'
-  
+
   userDN = Registry.getDNForUsername( user )
   if not userDN[ 'OK' ]:
     return S_ERROR( 'Cannot discover DN for user %s: %s' % ( user, userDN[ 'Message' ] ) )
   userDN = userDN[ 'Value' ][ 0 ]
-  
+
   chain = gProxyManager.downloadVOMSProxy( userDN, group )
   if not chain[ 'OK' ]:
     return S_ERROR( 'Proxy file cannot be retrieved: %s' % chain[ 'Message' ] )
   chain = chain[ 'Value' ]
-  
+
   proxyPath = "%s/proxy.%s.%s" % ( os.getcwd(), user, group )
   result = chain.dumpAllToFile( proxyPath )
   if not result[ 'OK' ]:
@@ -28,7 +28,7 @@ def getProxyByVO( user, vo ):
 
 def getSiteForCE( ce ):
   _basePath = 'Resources/Sites'
-      
+
   domains = gConfig.getSections( _basePath )[ 'Value' ]
   for domain in domains:
     sites = gConfig.getSections( '%s/%s' % ( _basePath, domain ) )[ 'Value' ]
@@ -47,7 +47,7 @@ def getSiteVO( siteName ):
     allVOs = res[ 'Value' ]
   else:
     allVOs = [ 'bes', 'cepc', 'juno' ]
-  
+
   domain = siteName.split( '.' )[ 0 ]
   if domain == 'CLOUD':
     vos = []
@@ -78,6 +78,5 @@ def getSiteVO( siteName ):
     if vos:
       vos = [ vo.strip() for vo in vos.split( ',' ) ]
       return vos
-    
+
   return allVOs
-  

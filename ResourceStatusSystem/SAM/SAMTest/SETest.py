@@ -1,7 +1,7 @@
 """ SETest
 
   A test class to test the availability of SE.
-  
+
 """
 
 import os, time
@@ -17,21 +17,21 @@ class SETest( TestBase ):
   """
     SETest is used to test the availability of SE.
   """
-    
+
   def __init__( self, args = None, apis = None ):
     super( SETest, self ).__init__( args, apis )
-    
+
     self.timeout = self.args.get( 'timeout', 60 )
     self.__lfnPath = '/bes/user/z/zhaoxh/'
     self.__testFile = 'test.dat'
     self.__localPath = '/tmp/'
-    
+
     if 'DataManager' in self.apis:
       self.dm = self.apis[ 'DataManager' ]
     else:
       self.dm = DataManager()
-    
-    
+
+
   def doTest( self, elementDict ):
     """
       Test upload and download for specified SE.
@@ -44,20 +44,20 @@ class SETest( TestBase ):
       f = open( testFilePath, 'w' )
       f.write( 'hello' )
       f.close()
-        
+
     status = 'OK'
     log = ''
     lfnPath = self.__lfnPath + elementName + '-' + self.__testFile
     submissionTime = datetime.utcnow().replace( microsecond = 0 )
 
-    LOCK.acquire()   
+    LOCK.acquire()
     start = time.time()
     result = self.dm.putAndRegister( lfnPath, testFilePath, elementName )
     uploadTime = time.time() - start
     if result[ 'OK' ]:
       log += 'Succeed to upload file to SE %s.\n' % elementName
       log += 'Upload Time : %ss\n' % uploadTime
-      
+
       start = time.time()
       result = self.dm.getReplica( lfnPath, elementName, self.__localPath )
       downloadTime = time.time() - start
@@ -67,18 +67,18 @@ class SETest( TestBase ):
       else:
         status = 'Bad'
         log += 'Failed to download file from SE %s : %s\n' % ( elementName, result[ 'Message' ] )
-      
+
       result = self.dm.removeFile( lfnPath )
       if result[ 'OK' ]:
         log += 'Succeed to delete file from SE %s.\n' % elementName
       else:
         log += 'Faile to delete file from SE %s : %s\n' % ( elementName, result[ 'Message' ] )
-        
+
     else:
       status = 'Bad'
       log += 'Failed to upload file to SE %s : %s\n' % ( elementName, result[ 'Message' ] )
     LOCK.release()
-      
+
     completionTime = datetime.utcnow().replace( microsecond = 0 )
     applicationTime = ( completionTime - submissionTime ).total_seconds()
 
@@ -94,6 +94,6 @@ class SETest( TestBase ):
     localFile = self.__localPath + elementName +'-' + self.__testFile
     if os.path.exists( localFile ) and os.path.isfile( localFile ):
       os.remove( localFile )
-      
+
     return S_OK( result )
 

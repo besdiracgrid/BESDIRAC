@@ -332,7 +332,7 @@ Ext.define('BESDIRAC.SiteStatusMonitor.classes.SiteStatusMonitor', {
 							GLOBAL.APP.CF.msg("error", jsonData.error);
 						} else {
 							var oWindow = me.getContainer().createChildWindow(
-									'SAM Information - ' + oSite, false, 500,
+									'SAM Information - ' + oSite, false, 600,
 									300);
 
 							var oFields = ['ElementName', 'ElementType',
@@ -415,7 +415,7 @@ Ext.define('BESDIRAC.SiteStatusMonitor.classes.SiteStatusMonitor', {
 							var oData = jsonData.result;
 							var oWindow = me.getContainer().createChildWindow(
 									oElementName + ' - ' + oTestType, false,
-									500, 300);
+									640, 480);
 							var oForm = Ext.create('Ext.form.Panel', {
 										title : 'SAM Detail Information',
 										defaults : {

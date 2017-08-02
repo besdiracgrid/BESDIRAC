@@ -2,23 +2,23 @@ import math
 from DIRAC                                                         import S_OK
 from DIRAC.WorkloadManagementSystem.DB.JobDB import JobDB
 from DIRAC.ResourceStatusSystem.Command.Command                    import Command
-from BESDIRAC.ResourceStatusSystem.Client.ResourceManagementClient import ResourceManagementClient
+from BESDIRAC.ResourceStatusSystem.Client.ResourceManagementIHEPClient import ResourceManagementIHEPClient
 
 
-class WorkNodeCommand( Command ):
+class WorkNodeIHEPCommand( Command ):
 
   def __init__( self, args = None, clients = None ):
-    super( WorkNodeCommand, self ).__init__( args, clients )
+    super( WorkNodeIHEPCommand, self ).__init__( args, clients )
 
     if 'JobDB' in self.apis:
       self.jobDB = self.apis[ 'JobDB' ]
     else:
       self.jobDB = JobDB()
 
-    if 'ResourceManagementClient' in self.apis:
-      self.rmClient = self.apis[ 'ResourceManagementClient' ]
+    if 'ResourceManagementIHEPClient' in self.apis:
+      self.rmIHEPClient = self.apis[ 'ResourceManagementIHEPClient' ]
     else:
-      self.rmClient = ResourceManagementClient()
+      self.rmIHEPClient = ResourceManagementIHEPClient()
 
 
   def _storeCommand( self, result):
@@ -27,7 +27,7 @@ class WorkNodeCommand( Command ):
     """
 
     for hostDict in result:
-      resQuery = self.rmClient.addOrModifyWorkNodeCache( host = hostDict[ 'Host' ],
+      resQuery = self.rmIHEPClient.addOrModifyWorkNodeCache( host = hostDict[ 'Host' ],
                                                      site = hostDict[ 'Site' ],
                                                      done = hostDict[ 'Done' ],
                                                      failed = hostDict[ 'Failed' ],
@@ -36,17 +36,17 @@ class WorkNodeCommand( Command ):
         return resQuery
     return S_OK()
 
- 
+
   def doNew( self, masterParams = None ):
 
     hosts = masterParams
 
     sql = """
-select JP.Value, J.Status, J.Site, count(*) from Jobs J, JobParameters JP 
-where J.JobID = JP.JobID and JP.Name = 'HostName' 
-and J.EndExecTime >= DATE_SUB(UTC_TIMESTAMP(),INTERVAL 24 HOUR) 
+select JP.Value, J.Status, J.Site, count(*) from Jobs J, JobParameters JP
+where J.JobID = JP.JobID and JP.Name = 'HostName'
+and J.EndExecTime >= DATE_SUB(UTC_TIMESTAMP(),INTERVAL 24 HOUR)
 group by JP.Value, J.Status
-""" 
+"""
 
     jobDB = JobDB()
     queryRes = jobDB._query(sql)
@@ -79,7 +79,7 @@ group by JP.Value, J.Status
       uniformResult.append( hostDict )
 
     if len(hosts) != 0:
-      deleteRes = self.rmClient.deleteWorkNodeCache(host = hosts)
+      deleteRes = self.rmIHEPClient.deleteWorkNodeCache(host = hosts)
       if not deleteRes[ 'OK' ]:
         return deleteRes
 
@@ -97,7 +97,7 @@ group by JP.Value, J.Status
       Gets all sites and calls doNew method.
     """
 
-    queryRes = self.rmClient.selectWorkNodeCache(meta = { 'columns' : [ 'Host' ] })
+    queryRes = self.rmIHEPClient.selectWorkNodeCache(meta = { 'columns' : [ 'Host' ] })
     if not queryRes[ 'OK' ]:
       return queryRes
     records = queryRes[ 'Value' ]
@@ -107,4 +107,4 @@ group by JP.Value, J.Status
     if not jobsResults[ 'OK' ]:
       self.metrics[ 'failed' ].append( jobsResults[ 'Message' ] )
 
-    return S_OK( self.metrics )       
+    return S_OK( self.metrics )

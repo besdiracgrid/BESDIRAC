@@ -11,7 +11,7 @@ class SAMHistoryHandler(WebHandler):
         
   @asyncGen
   def web_getPlotData(self):
-    publisher = RPCClient('ResourceStatus/Publisher')
+    publisher = RPCClient('ResourceStatus/PublisherIHEP')
     
     args = self._request()
     category = args[ 'Category' ]
@@ -59,7 +59,7 @@ class SAMHistoryHandler(WebHandler):
 
   @asyncGen
   def web_getElements(self):
-    publisher = RPCClient('ResourceStatus/Publisher')
+    publisher = RPCClient('ResourceStatus/PublisherIHEP')
     
     elementType = self._request()[ 'ElementType' ]
     elements = yield self.threadTask(self.__getElementsByType, elementType, publisher)
@@ -73,7 +73,7 @@ class SAMHistoryHandler(WebHandler):
 
   @asyncGen
   def web_getVOs(self):
-    publisher = RPCClient('ResourceStatus/Publisher')
+    publisher = RPCClient('ResourceStatus/PublisherIHEP')
     
     vos = yield self.threadTask( publisher.getVOs )
     if vos[ 'OK' ]:

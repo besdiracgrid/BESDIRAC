@@ -30,6 +30,5 @@ class CLOUDAccessTest:
       url = gConfig.getValue( '%s/CLOUD/%s/Cloud/%s/%s' % ( _basePath, element, cloud, key ) )
       if url:
         return S_OK(re.match(r'https?://(.+):([0-9]+).*', url).groups())
-          
+
     return S_ERROR('%s is not a vaild CLOUD.' % element)
-                  
