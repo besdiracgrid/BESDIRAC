@@ -1,6 +1,17 @@
 BESDIRAC CHANGELOG
 ==================
 
+v0r17 (2017-08-02)
+---------------------
+
+### New Feature
+- Transfer accounting web page is added
+
+### Change
+- Use DIRAC v6r15
+- Database of ResourceStatusIHEPDB for IHEP DIRAC monitoring is separated from
+  the DIRAC ResourceStatusDB
+
 v0r16 (2016-09-18)
 ---------------------
 
