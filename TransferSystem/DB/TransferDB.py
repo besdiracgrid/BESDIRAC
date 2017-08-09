@@ -167,8 +167,8 @@ class TransferDB(DB):
     for dsfile in map(FilesInDatasetEntryWithID._make, filelist):
       entry = TransFileListEntry(LFN = dsfile.LFN,
                                  trans_req_id = trans_req_id,
-                                 start_time = None,
-                                 finish_time = None,
+                                 start_time = '0000-00-00',
+                                 finish_time = '0000-00-00',
                                  status = "new",
                                  error = "",
                                  )

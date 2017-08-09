@@ -45,6 +45,8 @@ class helper_TransferAgent(object):
             "error": ""}
     # Add the Transfer
     worker = gTransferFactory.generate(req.protocol, info)
+    if worker is None:
+      return True
     self.transferAgent.transfer_worker.append(worker)
     # Change the status
     self.helper_status_update(
