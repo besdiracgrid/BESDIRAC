@@ -2,6 +2,7 @@ import json, math
 from DIRAC                      import S_OK
 from WebAppDIRAC.Lib.WebHandler import WebHandler, WErr, WOK, asyncGen
 from DIRAC.Core.DISET.RPCClient import RPCClient
+from DIRAC.Interfaces.API.DiracAdmin import DiracAdmin
 
 
 class SiteStatusMonitorHandler( WebHandler ):
@@ -265,9 +266,10 @@ class SiteStatusMonitorHandler( WebHandler ):
 
 
   def __getSitesMaskStatus( self, sitesName ):
-    wmsAdmin = RPCClient( 'WorkloadManagement/WMSAdministrator' )
-
-    activeSites = wmsAdmin.getSiteMask()
+    diracAdmin = DiracAdmin()
+    activeSites = diracAdmin.getSiteMask()
+#    wmsAdmin = RPCClient( 'WorkloadManagement/WMSAdministrator' )
+#    activeSites = wmsAdmin.getSiteMask()
 
     if not activeSites[ 'OK' ]:
       return activeSites

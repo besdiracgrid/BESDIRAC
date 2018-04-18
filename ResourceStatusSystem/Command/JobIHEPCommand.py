@@ -9,6 +9,7 @@ from DIRAC.Core.DISET.RPCClient                                    import RPCCli
 from DIRAC.ResourceStatusSystem.Command.Command                    import Command
 from DIRAC.ResourceStatusSystem.Utilities                          import CSHelpers
 from BESDIRAC.ResourceStatusSystem.Client.ResourceManagementIHEPClient import ResourceManagementIHEPClient
+from DIRAC.Interfaces.API.DiracAdmin import DiracAdmin
 
 __RCSID__ = '$Id:  $'
 
@@ -83,7 +84,10 @@ class JobIHEPCommand( Command ):
         return params
       name = params[ 'Value' ]
 
-    resultMask = self.wmsAdmin.getSiteMask()
+#    resultMask = self.wmsAdmin.getSiteMask()
+    diracAdmin = DiracAdmin()
+    resultMask = diracAdmin.getSiteMask()
+    print '::::::::::::::::', name, resultMask
     if not resultMask[ 'OK' ]:
       return resultMask
     resultMask = resultMask[ 'Value' ]
@@ -123,8 +127,14 @@ class JobIHEPCommand( Command ):
     for site in name:
       recordDict = {}
       recordDict[ 'Site' ] = site
+      if site in resultMask:
+        recordDict[ 'MaskStatus' ] = 'Active'
+      else:
+        recordDict[ 'MaskStatus' ] = 'Banned'
+      print ':::::::::::::: ', site, recordDict[ 'MaskStatus' ]
+
       if siteJobs.has_key( site ):
-        recordDict[ 'MaskStatus' ] = siteJobs[ site ][ 'MaskStatus' ]
+#        recordDict[ 'MaskStatus' ] = siteJobs[ site ][ 'MaskStatus' ]
         recordDict[ 'Running' ] = siteJobs[ site ][ 'Running' ]
         recordDict[ 'Waiting' ] = siteJobs[ site ][ 'Waiting' ] + siteJobs[ site ][ 'Checking' ]
         recordDict[ 'Done' ] = siteJobs[ site ][ 'Done' ]
@@ -134,10 +144,6 @@ class JobIHEPCommand( Command ):
         recordDict[ 'Efficiency' ] = float( siteJobs[ site ][ 'Efficiency' ] )
         recordDict[ 'Status' ] = siteJobs[ site ][ 'Status' ]
       else:
-        if site in resultMask:
-          recordDict[ 'MaskStatus' ] = 'Active'
-        else:
-          recordDict[ 'MaskStatus' ] = 'Banned'
         recordDict[ 'Running' ] = 0
         recordDict[ 'Waiting' ] = 0
         recordDict[ 'Done' ] = 0
