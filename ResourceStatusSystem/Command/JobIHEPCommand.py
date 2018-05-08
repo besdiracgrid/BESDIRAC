@@ -87,7 +87,6 @@ class JobIHEPCommand( Command ):
 #    resultMask = self.wmsAdmin.getSiteMask()
     diracAdmin = DiracAdmin()
     resultMask = diracAdmin.getSiteMask()
-    print '::::::::::::::::', name, resultMask
     if not resultMask[ 'OK' ]:
       return resultMask
     resultMask = resultMask[ 'Value' ]
@@ -131,7 +130,6 @@ class JobIHEPCommand( Command ):
         recordDict[ 'MaskStatus' ] = 'Active'
       else:
         recordDict[ 'MaskStatus' ] = 'Banned'
-      print ':::::::::::::: ', site, recordDict[ 'MaskStatus' ]
 
       if siteJobs.has_key( site ):
 #        recordDict[ 'MaskStatus' ] = siteJobs[ site ][ 'MaskStatus' ]
