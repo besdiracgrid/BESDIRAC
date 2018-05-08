@@ -16,6 +16,7 @@ from BESDIRAC.ResourceStatusSystem.Client.ResourceManagementIHEPClient import Re
 from BESDIRAC.ResourceStatusSystem.SAM.TestExecutor                import TestExecutor
 from BESDIRAC.ResourceStatusSystem.SAM.StatusEvaluator             import StatusEvaluator
 from BESDIRAC.ResourceStatusSystem.Utilities import BESUtils
+from DIRAC.Interfaces.API.DiracAdmin import DiracAdmin
 
 
 __RCSID__ = '$Id:  $'
@@ -72,11 +73,14 @@ class SAMTestAgent(AgentModule):
                                               'ElementType' : 'StorageElement' } )
 
     noTestSites = [ site.strip() for site in self.am_getOption( 'noTestSite', '' ).split( ',' ) if site != '' ]
-    wmsAdmin = RPCClient('WorkloadManagement/WMSAdministrator')
-    activeSites = wmsAdmin.getSiteMask()
+    diracAdmin = DiracAdmin()
+    activeSites = diracAdmin.getSiteMask()
+#    wmsAdmin = RPCClient('WorkloadManagement/WMSAdministrator')
+#    activeSites = wmsAdmin.getSiteMask()
     if not activeSites[ 'OK' ]:
       return activeSites
     activeSites = [ site for site in activeSites[ 'Value' ] if site not in noTestSites ]
+    gLogger.info('Active sites: %s', activeSites)
 
     for siteName in activeSites:
       domain = siteName.split('.')[ 0 ]
