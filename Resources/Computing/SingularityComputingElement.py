@@ -17,7 +17,7 @@ import shutil
 import tempfile
 
 import DIRAC
-from DIRAC import S_OK, S_ERROR, gConfig
+from DIRAC import S_OK, S_ERROR, gConfig, gLogger
 from DIRAC.Core.Security.ProxyInfo import getProxyInfo
 from DIRAC.Core.Utilities.Subprocess import shellCall
 from DIRAC.ConfigurationSystem.Client.Helpers import CSGlobals
@@ -70,6 +70,8 @@ class SingularityComputingElement(ComputingElement):
     self.__innerdir = CONTAINER_INNERDIR
     self.__singularityBin = 'singularity'
 
+    self.log = gLogger.getSubLogger('Singularity')
+
   def __hasSingularity(self):
     """ Search the current PATH for an exectuable named singularity.
         Returns True if it is found, False otherwise.
@@ -78,6 +80,7 @@ class SingularityComputingElement(ComputingElement):
       binPath = self.ceParameters['ContainerBin']
       if os.path.isfile(binPath) and os.access(binPath, os.X_OK):
         self.__singularityBin = binPath
+        self.log.debug('Use singularity from "%s"' % self.__singularityBin)
         return True
     if "PATH" not in os.environ:
       return False  # Hmm, PATH not set? How unusual...
@@ -86,6 +89,7 @@ class SingularityComputingElement(ComputingElement):
       if os.path.isfile(binPath):
         # File found, check it's exectuable to be certain:
         if os.access(binPath, os.X_OK):
+          self.log.debug('Find singularity from PATH "%s"' % binPath)
           return True
     # No suitablable binaries found
     return False
@@ -154,6 +158,8 @@ class SingularityComputingElement(ComputingElement):
       result = S_ERROR("Failed to create container work directory in '%s'" % self.__workdir)
       result['ReschedulePayload'] = True
       return result
+
+    self.log.debug('Use singularity workarea: %s' % baseDir)
     for subdir in ["home", "tmp", "var_tmp"]:
       os.mkdir(os.path.join(baseDir, subdir))
     tmpDir = os.path.join(baseDir, "tmp")
@@ -279,20 +285,27 @@ class SingularityComputingElement(ComputingElement):
     # Mount /cvmfs in if it exists on the host
     withCVMFS = os.path.isdir("/cvmfs")
     innerCmd = os.path.join(self.__innerdir, "dirac_container.sh")
-    cmd = '"%s" exec -C' % self.__singularityBin
+
+    singularityOpts = []
+    singularityOpts.append('exec')
+    singularityOpts.append('-c')
+    singularityOpts.append('-W "%s"' % baseDir)
     if withCVMFS:
-      cmd += ' -B /cvmfs'
-    cmd += ' -W "%s"' % baseDir
+      singularityOpts.append('-B /cvmfs')
     if 'ContainerBind' in self.ceParameters:
       bindPaths = self.ceParameters['ContainerBind'].split(',')
       for bindPath in bindPaths:
-        cmd += ' -B "%s"' % bindPath.strip()
+        singularityOpts.append('-B "%s"' % bindPath.strip())
     if 'ContainerOptions' in self.ceParameters:
-      cmd += ' '
-      cmd += self.ceParameters['ContainerOptions']
-    cmd += ' "%s" "%s"' % (rootImage, innerCmd)
+      singularityOpts.append(self.ceParameters['ContainerOptions'])
+    singularityOpts.append('"%s"' % rootImage)
+    singularityOpts.append('"%s"' % innerCmd)
 
-    result = shellCall(0, cmd, callbackFunction=self.sendOutput, env=self.__getEnv())
+    cmd = '"%s" %s' % (self.__singularityBin, ' '.join(singularityOpts))
+    self.log.debug('Execute singularity command: %s' % cmd)
+    env = self.__getEnv()
+    self.log.debug('Execute singularity env: %s' % env)
+    result = shellCall(0, cmd, callbackFunction=self.sendOutput, env=env)
     self.__runningJobs -= 1
 
     if not result["OK"]:
