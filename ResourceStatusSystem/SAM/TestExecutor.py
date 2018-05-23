@@ -147,11 +147,9 @@ class TestExecutor( object ):
     if execTests == []:
       return S_ERROR( 'No SAM test matched for %s' % elementName )
 
-
     testResults = {}
     runningTestsQueue = Queue.Queue()
     for testType in execTests:
-      print "+++++++++++++++++++, the list of tests %s for %s", ( testType, element[ 'ElementName' ] )
       testObj = self.__tests[ testType ][ 'object' ]
       result = testObj.doTest( element )
       if not result[ 'OK' ]:
@@ -185,7 +183,6 @@ class TestExecutor( object ):
     runningTestsQueue.join()
 
     storeRes = self.__storeTestResults( elementName, elementType, testResults )
-  
 
     if not storeRes[ 'OK' ]:
       return S_ERROR( 'Failed to store SAM test results: %s' % storeRes[ 'Message' ] )
