@@ -289,6 +289,8 @@ class SingularityComputingElement(ComputingElement):
     singularityOpts = []
     singularityOpts.append('exec')
     singularityOpts.append('-c')
+    singularityOpts.append('-i')
+    singularityOpts.append('-p')
     singularityOpts.append('-W "%s"' % baseDir)
     if withCVMFS:
       singularityOpts.append('-B /cvmfs')
