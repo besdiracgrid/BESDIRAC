@@ -34,19 +34,19 @@ TESTS = {
     'module' : 'CEPCTest',
     'match' : { 'ElementType' : ( 'ComputingElement', 'CLOUD' ), 'VO' : 'cepc' },
     'args' : { 'executable' : 'cepc_test.py', 'timeout' : 2400 }
-   },
+  },
 
   'JUNO-Test':
   {
    'module' : 'JUNOTest',
    'match' : { 'ElementType' : ( 'ComputingElement', 'CLOUD' ), 'VO' : 'juno' },
    'args' : { 'executable' : 'juno_test.py', 'timeout' : 2400 }
-   },
+  },
 
   'SE-Test' :
   {
     'module' : 'SETest',
     'match' : { 'ElementType' : ( 'StorageElement', ) }
-  }
+  },
 
 }

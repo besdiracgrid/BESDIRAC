@@ -53,14 +53,14 @@ echo "Finishing inner continer wrapper scripts at `date`."
 """
 
 
-class SingularityComputingElement(ComputingElement):
+class SingularityBESComputingElement(ComputingElement):
   """ A Computing Element for running a job within a Singularity container.
   """
 
   def __init__(self, ceUniqueID):
     """ Standard constructor.
     """
-    super(SingularityComputingElement, self).__init__(ceUniqueID)
+    super(SingularityBESComputingElement, self).__init__(ceUniqueID)
     self.__submittedJobs = 0
     self.__runningJobs = 0
     self.__root = CONTAINER_DEFROOT
