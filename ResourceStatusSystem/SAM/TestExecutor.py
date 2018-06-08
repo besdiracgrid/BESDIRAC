@@ -5,6 +5,8 @@
   the test results to database.
 """
 
+import time
+import random
 import Queue
 from datetime import datetime
 from DIRAC                                                         import S_OK, S_ERROR, gLogger
@@ -150,6 +152,7 @@ class TestExecutor( object ):
     testResults = {}
     runningTestsQueue = Queue.Queue()
     for testType in execTests:
+      self.log.debug( "The list of tests %s for %s" % ( testType, element[ 'ElementName' ] ) )
       testObj = self.__tests[ testType ][ 'object' ]
       result = testObj.doTest( element )
       if not result[ 'OK' ]:
@@ -163,6 +166,7 @@ class TestExecutor( object ):
         runningTestsQueue.put( testType )
 
     while not runningTestsQueue.empty():
+      time.sleep(random.randint(30, 90))
       testType = runningTestsQueue.get_nowait()
       testObj = self.__tests[ testType ][ 'object' ]
       jobID = testResults[ testType ][ 'JobID' ]

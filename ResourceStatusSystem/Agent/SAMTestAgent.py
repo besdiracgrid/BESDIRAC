@@ -92,6 +92,8 @@ class SAMTestAgent(AgentModule):
           elements.append( { 'ElementName' : ce,
                                                   'ElementType' : 'ComputingElement',
                                                   'VO' : vos } )
+          gLogger.debug("List of elements: %s" % ce)
+
       else:
         sitesCEs[ siteName ] = [ siteName ]
         elements.append( { 'ElementName' : siteName,
@@ -145,11 +147,13 @@ class SAMTestAgent(AgentModule):
     vos = elementDict.get( 'VO' ) or []
     utcNow = datetime.utcnow().replace( microsecond = 0 )
 
+    # Return status of each Testtype
     testRes = self.testExecutor.execute( elementDict, lastCheckTime = utcNow )
     if not testRes[ 'OK' ]:
-      gLogger.error( 'TestExecutor.execute: %s' % testRes[ 'Message' ] )
+      gLogger.error( 'TestExecutor.execute error for %s: %s' % ( elementName, testRes[ 'Message' ] ) )
       return
     testsStatus = testRes[ 'Value' ]
+    gLogger.info( 'The status of %s is %s' % ( elementName, testsStatus ) )
 
     defaultTestsStatus = {}
     voTestsStatus = {}
