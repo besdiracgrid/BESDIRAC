@@ -8,7 +8,7 @@ from datetime                             import datetime
 
 from DIRAC                                import S_OK, S_ERROR
 from DIRAC.Core.Base.DB                   import DB
-from DIRAC.ResourceStatusSystem.Utilities import MySQLWrapper
+from BESDIRAC.ResourceStatusSystem.Utilities import MySQLWrapper
 
 __RCSID__ = '$Id: $'
 
