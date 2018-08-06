@@ -48,7 +48,7 @@ extra_dStrError = {
         134 : 'Aborted with SIGABRT',
         137 : 'Killed by system',
 
-        66 : 'BOSS andom trigger file not found',
+        66 : 'BOSS random trigger file not found',
         70 : 'BOSS CVMFS not found',
         71 : 'BOSS too many runs for reconstruction',
         72 : 'BOSS upload output data error',
