@@ -33,7 +33,7 @@ extra_dErrorCode = {
 
         11 : 'ECEPCCVMFS',
         12 : 'ECEPCDOWNLOADINPUT',
-        20 : 'ECEPCSIM'
+        20 : 'ECEPCSIM',
         21 : 'ECEPCDATABASE',
         22 : 'ECEPCTOOMANYSUBSTEPS',
         23 : 'ECEPCSIMNOEVENTS',
@@ -55,7 +55,7 @@ extra_dStrError = {
 
         11 : 'CEPC CVMFS not found',
         12 : 'CEPC download input error',
-        20 : 'CEPC simulation error'
+        20 : 'CEPC simulation error',
         21 : 'CEPC database connection error',
         22 : 'CEPC too many substeps',
         23 : 'CEPC simulation insufficient events',
