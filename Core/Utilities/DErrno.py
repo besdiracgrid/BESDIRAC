@@ -4,7 +4,7 @@ extra_dErrName = {
         'EAPPSIGABRT'      : 134,
         'EAPPKILLED'       : 137,
 
-        'EBOSSRANTRGNOTFOUND'  : 66,
+        'EBOSSRANTRGERROR'     : 66,
         'EBOSSCVMFS'           : 70,
         'EBOSSTOOMANYRUNS'     : 71,
         'EBOSSUPLOAD'          : 72,
@@ -26,7 +26,7 @@ extra_dErrorCode = {
         134 : 'EAPPSIGABRT',
         137 : 'EAPPKILLED',
 
-        66 : 'EBOSSRANTRGNOTFOUND',
+        66 : 'EBOSSRANTRGERROR',
         70 : 'EBOSSCVMFS',
         71 : 'EBOSSTOOMANYRUNS',
         72 : 'EBOSSUPLOAD',
@@ -48,7 +48,7 @@ extra_dStrError = {
         134 : 'Aborted with SIGABRT',
         137 : 'Killed by system',
 
-        66 : 'BOSS random trigger file not found',
+        66 : 'BOSS random trigger download error',
         70 : 'BOSS CVMFS not found',
         71 : 'BOSS too many runs for reconstruction',
         72 : 'BOSS upload output data error',
