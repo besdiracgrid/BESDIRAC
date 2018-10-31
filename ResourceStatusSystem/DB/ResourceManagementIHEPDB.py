@@ -8,7 +8,7 @@ from datetime                             import datetime
 
 from DIRAC                                import S_OK, S_ERROR
 from DIRAC.Core.Base.DB                   import DB
-from DIRAC.ResourceStatusSystem.Utilities import MySQLWrapper
+from BESDIRAC.ResourceStatusSystem.Utilities import MySQLWrapper
 
 __RCSID__ = '$Id: $'
 
@@ -78,7 +78,7 @@ class ResourceManagementIHEPDB( object ):
 
   _tablesDB[ 'ResourceSAMStatus' ] = { 'Fields' :
                      {
-                       'VO'            : 'VARCHAR(8) NOT NULL',
+                       'VO'            : 'VARCHAR(32) NOT NULL',
                        'ElementName'   : 'VARCHAR(64) NOT NULL',
                        'ElementType'   : 'VARCHAR(16) NOT NULL',
                        'Tests'         : 'VARCHAR(256) NOT NULL DEFAULT ""',
@@ -90,7 +90,7 @@ class ResourceManagementIHEPDB( object ):
 
   _tablesDB[ 'SiteSAMStatus' ] = { 'Fields' :
                      {
-                       'VO'            : 'VARCHAR(8) NOT NULL',
+                       'VO'            : 'VARCHAR(32) NOT NULL',
                        'Site'          : 'VARCHAR(32) NOT NULL',
                        'SiteType'      : 'VARCHAR(8) NOT NULL',
                        'Status'        : 'VARCHAR(8) NOT NULL DEFAULT ""',
@@ -123,7 +123,7 @@ class ResourceManagementIHEPDB( object ):
   _tablesLike[ 'ResourceSAMStatusWithID' ] = { 'Fields' :
                      {
                        'ID'            : 'BIGINT UNSIGNED AUTO_INCREMENT NOT NULL',
-                       'VO'            : 'VARCHAR(8) NOT NULL',
+                       'VO'            : 'VARCHAR(32) NOT NULL',
                        'ElementName'   : 'VARCHAR(64) NOT NULL',
                        'ElementType'   : 'VARCHAR(16) NOT NULL',
                        'Tests'         : 'VARCHAR(256) NOT NULL DEFAULT ""',
@@ -136,7 +136,7 @@ class ResourceManagementIHEPDB( object ):
   _tablesLike[ 'SiteSAMStatusWithID' ] = { 'Fields' :
                      {
                        'ID'            : 'BIGINT UNSIGNED AUTO_INCREMENT NOT NULL',
-                       'VO'            : 'VARCHAR(8) NOT NULL',
+                       'VO'            : 'VARCHAR(32) NOT NULL',
                        'Site'          : 'VARCHAR(32) NOT NULL',
                        'SiteType'      : 'VARCHAR(8) NOT NULL',
                        'Status'        : 'VARCHAR(8) NOT NULL DEFAULT ""',

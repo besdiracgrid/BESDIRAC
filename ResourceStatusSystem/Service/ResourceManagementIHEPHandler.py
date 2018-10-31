@@ -7,7 +7,7 @@
 from DIRAC                                              import gConfig, S_OK, gLogger
 from DIRAC.Core.DISET.RequestHandler                    import RequestHandler
 from DIRAC.ResourceStatusSystem.Utilities               import Synchronizer, Utils
-ResourceManagementIHEPDB = getattr(Utils.voimport( 'DIRAC.ResourceStatusSystem.DB.ResourceManagementIHEPDB' ),'ResourceManagementIHEPDB')
+from BESDIRAC.ResourceStatusSystem.DB.ResourceManagementIHEPDB import ResourceManagementIHEPDB
 
 __RCSID__ = '$Id: $'
 
