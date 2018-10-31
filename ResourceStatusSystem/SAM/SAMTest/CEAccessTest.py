@@ -37,10 +37,15 @@ class CEAccessTest:
 
         if element in ces:
           host = gConfig.getValue('%s/%s/%s/CEs/%s/SSHHost' % ( _basePath, domain, site, element ))
+          cetype = gConfig.getValue('%s/%s/%s/CEs/%s/CEType' % ( _basePath, domain, site, element ))
           if host:
             idx = host.find('/')
             if idx != -1: host = host[ 0 : idx ]
             return S_OK((host, 22))
+          elif cetype == 'CREAM':
+            return S_OK((element, 8443))
+          elif cetype == 'ARC':
+            return S_OK((element, 2135))
           else:
             return S_OK((element, 8443))
 
