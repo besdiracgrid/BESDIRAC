@@ -67,11 +67,7 @@ class SAMTestAgent(AgentModule):
     elements = []
     sitesCEs = {}
 
-    ses = gConfig.getValue( 'Resources/StorageElementGroups/SE-USER' )
-    for se in ses.split( ', ' ):
-      elements.append( { 'ElementName' : se,
-                                              'ElementType' : 'StorageElement' } )
-
+    # CE tests
     noTestSites = [ site.strip() for site in self.am_getOption( 'noTestSite', '' ).split( ',' ) if site != '' ]
     diracAdmin = DiracAdmin()
     activeSites = diracAdmin.getSiteMask()
@@ -99,6 +95,25 @@ class SAMTestAgent(AgentModule):
         elements.append( { 'ElementName' : siteName,
                                                 'ElementType' : 'CLOUD',
                                                 'VO' : vos } )
+
+    # SE tests
+    ses = gConfig.getValue( 'Resources/StorageElementGroups/SE-USER' )
+    for se in ses.split( ', ' ):
+      seSites = BESUtils.getSitesForSE( se )
+      for seSite in seSites:
+        gLogger.debug( 'Site for SE %s: %s' % (se, seSite) )
+        if seSite not in activeSites:
+          continue
+        vos = BESUtils.getSiteVO( seSite )
+        gLogger.debug( 'vos for SE %s under site %s: %s' % (se, seSite, vos) )
+        if len(vos) == 0:
+          continue
+        vo = vos[0]
+        elements.append( { 'ElementName' : se,
+                                              'ElementType' : 'StorageElement',
+                                              'VO' : vo } )
+        gLogger.info( 'VO for SE %s: %s' % ( se, vo ) )
+        break
 
     lastCheckTime = datetime.utcnow().replace(microsecond = 0)
     self.elementsStatus = {}

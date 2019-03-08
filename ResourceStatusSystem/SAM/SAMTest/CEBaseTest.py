@@ -100,7 +100,7 @@ class CEBaseTest( TestBase ):
       job.setDestinationCE( CE )
 
     LOCK.acquire()
-    proxyPath = BESUtils.getProxyByVO( 'yant', vo )
+    proxyPath = BESUtils.getProxyByVO( 'zhangxm', vo )
     if not proxyPath[ 'OK' ]:
       LOCK.release()
       return proxyPath
@@ -185,7 +185,7 @@ class CEBaseTest( TestBase ):
 
     if status in ( 'Done', 'Failed' ):
       LOCK.acquire()
-      proxyPath = BESUtils.getProxyByVO( 'yant', vo )
+      proxyPath = BESUtils.getProxyByVO( 'zhangxm', vo )
       if not proxyPath[ 'OK' ]:
         LOCK.release()
         return proxyPath

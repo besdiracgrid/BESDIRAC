@@ -10,6 +10,7 @@ from DIRAC                                              import S_OK, S_ERROR
 from DIRAC.DataManagementSystem.Client.DataManager      import DataManager
 from BESDIRAC.ResourceStatusSystem.SAM.SAMTest.TestBase import TestBase
 from BESDIRAC.ResourceStatusSystem.SAM.SAMTest.TestBase import LOCK
+from BESDIRAC.ResourceStatusSystem.Utilities import BESUtils
 
 
 
@@ -22,7 +23,7 @@ class SETest( TestBase ):
     super( SETest, self ).__init__( args, apis )
 
     self.timeout = self.args.get( 'timeout', 60 )
-    self.__lfnPath = '/bes/user/z/zhaoxh/'
+    self.__lfnPath = '/{vo}/user/z/zhangxm/'
     self.__testFile = 'test.dat'
     self.__localPath = '/tmp/'
 
@@ -38,6 +39,7 @@ class SETest( TestBase ):
     """
 
     elementName = elementDict[ 'ElementName' ]
+    vo = elementDict[ 'VO' ]
 
     testFilePath = self.__localPath + self.__testFile
     if not os.path.exists( testFilePath ) or not os.path.isfile( testFilePath ):
@@ -47,10 +49,17 @@ class SETest( TestBase ):
 
     status = 'OK'
     log = ''
-    lfnPath = self.__lfnPath + elementName + '-' + self.__testFile
+    lfnPath = self.__lfnPath.format(vo=vo) + elementName + '-' + self.__testFile
     submissionTime = datetime.utcnow().replace( microsecond = 0 )
 
     LOCK.acquire()
+    proxyPath = BESUtils.getProxyByVO( 'zhangxm', vo )
+    if not proxyPath[ 'OK' ]:
+      LOCK.release()
+      return proxyPath
+    proxyPath = proxyPath[ 'Value' ]
+    oldProxy = os.environ.get( 'X509_USER_PROXY' )
+    os.environ[ 'X509_USER_PROXY' ] = proxyPath
     start = time.time()
     result = self.dm.putAndRegister( lfnPath, testFilePath, elementName )
     uploadTime = time.time() - start
@@ -77,6 +86,10 @@ class SETest( TestBase ):
     else:
       status = 'Bad'
       log += 'Failed to upload file to SE %s : %s\n' % ( elementName, result[ 'Message' ] )
+    if oldProxy is None:
+      del os.environ[ 'X509_USER_PROXY' ]
+    else:
+      os.environ[ 'X509_USER_PROXY' ] = oldProxy
     LOCK.release()
 
     completionTime = datetime.utcnow().replace( microsecond = 0 )

@@ -39,6 +39,22 @@ def getSiteForCE( ce ):
         return site
 
 
+def getSitesForSE( se ):
+  _basePath = 'Resources/Sites'
+
+  seSites = []
+  domains = gConfig.getSections( _basePath )[ 'Value' ]
+  for domain in domains:
+    sites = gConfig.getSections( '%s/%s' % ( _basePath, domain ) )[ 'Value' ]
+    for site in sites:
+      ses = gConfig.getValue( '%s/%s/%s/SE' % ( _basePath, domain, site ), '' ).split( ',' )
+      ses = map(lambda str : str.strip(), ses);
+      if se in ses:
+        seSites.append(site)
+
+  return seSites
+
+
 def getSiteVO( siteName ):
   _basePath = 'Resources/Sites'
 
