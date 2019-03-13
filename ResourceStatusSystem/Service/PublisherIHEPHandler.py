@@ -431,25 +431,23 @@ class PublisherIHEPHandler( RequestHandler ):
   def __getSitesMaxJobs(self, sites):
     sitesMaxJobs = {}
 
+    _basePath = 'Resources/Sites'
+
     for site in sites:
       domain = site.split('.')[ 0 ]
 
       if domain == 'CLOUD':
-        _basePath = 'Resources/VirtualMachines/CloudEndpoints'
-        endpoints = gConfig.getSections(_basePath)
+        maxJobs = 0
+        endpoints = gConfig.getSections('%s/%s/%s/Cloud' % (_basePath, domain, site))
         if not endpoints[ 'OK' ]:
           return endpoints
         endpoints = endpoints[ 'Value' ]
         for endpoint in endpoints:
-          siteName = gConfig.getValue('%s/%s/siteName' % ( _basePath, endpoint ))
-          if site == siteName:
-            maxJobs = gConfig.getValue('%s/%s/maxEndpointInstances' % ( _basePath, endpoint ), 0)
-            sitesMaxJobs[ site ] = maxJobs
-            break
+          maxJobs += gConfig.getValue('%s/%s/%s/Cloud/%s/MaxInstances' % (_basePath, domain, site, endpoint), 0)
+        sitesMaxJobs[ site ] = maxJobs
 
       else:
         maxJobs = 0
-        _basePath = 'Resources/Sites'
         ces = gConfig.getSections('%s/%s/%s/CEs' % (_basePath, domain, site))
         if not ces[ 'OK' ]:
           return ces
