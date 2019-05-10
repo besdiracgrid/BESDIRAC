@@ -6,11 +6,11 @@
 
 import os, time
 from datetime                                           import datetime
-from DIRAC                                              import S_OK, S_ERROR
+from DIRAC                                              import S_OK, S_ERROR, gLogger
+from DIRAC.Core.Utilities.Subprocess                    import systemCall
 from DIRAC.DataManagementSystem.Client.DataManager      import DataManager
 from BESDIRAC.ResourceStatusSystem.SAM.SAMTest.TestBase import TestBase
-from BESDIRAC.ResourceStatusSystem.SAM.SAMTest.TestBase import LOCK
-from BESDIRAC.ResourceStatusSystem.Utilities import BESUtils
+from BESDIRAC.ResourceStatusSystem.Utilities            import BESUtils
 
 
 
@@ -26,6 +26,8 @@ class SETest( TestBase ):
     self.__lfnPath = '/{vo}/user/z/zhangxm/'
     self.__testFile = 'test.dat'
     self.__localPath = '/tmp/'
+    self.__scriptPath = '/opt/dirac/pro/BESDIRAC/ResourceStatusSystem/SAM/sam_script'
+    self.__scriptName = 'se_test.py'
 
     if 'DataManager' in self.apis:
       self.dm = self.apis[ 'DataManager' ]
@@ -52,45 +54,25 @@ class SETest( TestBase ):
     lfnPath = self.__lfnPath.format(vo=vo) + elementName + '-' + self.__testFile
     submissionTime = datetime.utcnow().replace( microsecond = 0 )
 
-    LOCK.acquire()
     proxyPath = BESUtils.getProxyByVO( 'zhangxm', vo )
     if not proxyPath[ 'OK' ]:
-      LOCK.release()
+      gLogger.error('Can not get proxy for VO %s' % vo)
       return proxyPath
     proxyPath = proxyPath[ 'Value' ]
-    oldProxy = os.environ.get( 'X509_USER_PROXY' )
-    os.environ[ 'X509_USER_PROXY' ] = proxyPath
-    start = time.time()
-    result = self.dm.putAndRegister( lfnPath, testFilePath, elementName )
-    uploadTime = time.time() - start
-    if result[ 'OK' ]:
-      log += 'Succeed to upload file to SE %s.\n' % elementName
-      log += 'Upload Time : %ss\n' % uploadTime
 
-      start = time.time()
-      result = self.dm.getReplica( lfnPath, elementName, self.__localPath )
-      downloadTime = time.time() - start
-      if result[ 'OK' ]:
-        log += 'Succeed to download file from SE %s.\n' % elementName
-        log += 'Download Time : %ss\n' % downloadTime
-      else:
-        status = 'Bad'
-        log += 'Failed to download file from SE %s : %s\n' % ( elementName, result[ 'Message' ] )
-
-      result = self.dm.removeFile( lfnPath )
-      if result[ 'OK' ]:
-        log += 'Succeed to delete file from SE %s.\n' % elementName
-      else:
-        log += 'Faile to delete file from SE %s : %s\n' % ( elementName, result[ 'Message' ] )
-
-    else:
+    env_test = os.environ.copy()
+    env_test[ 'X509_USER_PROXY' ] = proxyPath
+    cmd = [os.path.join(self.__scriptPath, self.__scriptName), '-o', '/DIRAC/Security/UseServerCertificate=no', lfnPath, testFilePath, elementName]
+    result = systemCall(300, cmd, env=env_test)
+    print result
+    if not result['OK']:
       status = 'Bad'
-      log += 'Failed to upload file to SE %s : %s\n' % ( elementName, result[ 'Message' ] )
-    if oldProxy is None:
-      del os.environ[ 'X509_USER_PROXY' ]
+      log += 'Call %s failed: %s' % (self.__scriptName, result['Message'])
+    elif result['Value'][0] != 0:
+      status = 'Bad'
+      log += '%s exit with error %s:\n%s' % (self.__scriptName, result['Value'][0], result['Value'][1])
     else:
-      os.environ[ 'X509_USER_PROXY' ] = oldProxy
-    LOCK.release()
+      log += '%s exit successfully:\n%s' % (self.__scriptName, result['Value'][1])
 
     completionTime = datetime.utcnow().replace( microsecond = 0 )
     applicationTime = ( completionTime - submissionTime ).total_seconds()

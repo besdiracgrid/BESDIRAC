@@ -440,7 +440,8 @@ class PublisherIHEPHandler( RequestHandler ):
         maxJobs = 0
         endpoints = gConfig.getSections('%s/%s/%s/Cloud' % (_basePath, domain, site))
         if not endpoints[ 'OK' ]:
-          return endpoints
+          gLogger.warn(endpoints['Message'])
+          continue
         endpoints = endpoints[ 'Value' ]
         for endpoint in endpoints:
           maxJobs += gConfig.getValue('%s/%s/%s/Cloud/%s/MaxInstances' % (_basePath, domain, site, endpoint), 0)
@@ -455,7 +456,8 @@ class PublisherIHEPHandler( RequestHandler ):
         for ce in ces:
           queues = gConfig.getSections('%s/%s/%s/CEs/%s/Queues' % (_basePath, domain, site, ce))
           if not queues[ 'OK' ]:
-            return queues
+            gLogger.warn(queues['Message'])
+            continue
           queues = queues[ 'Value' ]
           for queue in queues:
             maxJobs += gConfig.getValue('%s/%s/%s/CEs/%s/Queues/%s/MaxTotalJobs' % (_basePath, domain, site, ce, queue), 0)
